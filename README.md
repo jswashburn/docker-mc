@@ -17,10 +17,3 @@ docker run -itp 25565:25565 wwishy/gorkcraft
 ## Contributing
 Please keep this doc updated as changes are made, and write good-ish code.  
 Over-engineer everything.
-
-### TODO's
-* Update docker hub repo name from 'mc-demo' to 'gorkcraft', or just create a new repo entirely.
-* Test on Raspberry PI
-* Server backup strategy
-* CI/CD integration ADO -> Docker Hub? If you're bored.
-* Add info in this doc about Paper and Aikars flags
