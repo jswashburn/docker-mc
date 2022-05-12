@@ -1,12 +1,14 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $false)]
-    $jarFilename = "paper-latest.jar",
+    [string]$File = "paper-latest.jar",
 
     [Parameter(Mandatory = $false)]
-    $Memory = "4G"
+    [string]$Memory = "2G"
 )
 
+# The command that starts the minecraft server, using Aikars flags
+# https://docs.papermc.io/paper/aikars-flags
 $startServer = @"
 java ``
     -Xms$Memory -Xmx$Memory ``
@@ -17,7 +19,7 @@ java ``
     -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 ``
     -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem ``
     -XX:MaxTenuringThreshold=1 ``
-    -jar $jarFilename --nogui
+    -jar $File --nogui
 "@
 
 Invoke-Expression $startServer

@@ -11,7 +11,7 @@ RUN apt-get update
 RUN add-apt-repository universe
 RUN apt-get install -y powershell
 
-# Install OpenJDK
+# Install Java OpenJDK
 RUN apt install -y openjdk-17-jre-headless
 
 # Install screen
@@ -19,8 +19,9 @@ RUN apt-get -y install screen
 
 COPY . .
 
-# Run mc server, accept eula, run again
-RUN java -jar paper-latest.jar --nogui
-RUN pwsh -Command ./AcceptEula.ps1 -EulaPath ./eula.txt
+# Get the latest Paper server .jar file
+RUN pwsh -Command ./Update-PaperJar.ps1 -NoWarn
 
-CMD [ "pwsh" ]
+# Do initial server run and accept eula
+RUN java -jar paper-latest.jar --nogui
+RUN pwsh -Command ./Set-EulaAccepted.ps1 -EulaPath ./eula.txt

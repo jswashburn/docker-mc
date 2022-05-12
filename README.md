@@ -23,3 +23,4 @@ Over-engineer everything.
 * Test on Raspberry PI
 * Server backup strategy
 * CI/CD integration ADO -> Docker Hub? If you're bored.
+* Add info in this doc about Paper and Aikars flags
