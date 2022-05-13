@@ -17,6 +17,13 @@ RUN apt install -y openjdk-17-jre-headless
 # Install screen
 RUN apt-get -y install screen
 
+# Install require Az Powershell modules
+RUN pwsh -Command Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+RUN pwsh -Command Install-Module Az.Accounts
+RUN pwsh -Command Install-Module Az.Storage
+RUN pwsh -Command Install-Module Az.KeyVault
+RUN pwsh -Command Install-Module Az.Resources
+
 COPY . .
 
 # Get the latest Paper server .jar file
