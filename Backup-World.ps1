@@ -4,17 +4,18 @@ param(
     [string]$StorageAccountName,
 
     [Parameter(Mandatory = $true)]
-    [string]$Container,
+    [string]$ContainerName,
 
-    [Parameter(Mandatory = $true)]
-    [string]$ArchiveName,
+    [Parameter(Mandatory = $false)]
+    [string]$ArchiveName = "world.tar.gz",
 
-    [Parameter(Mandatory = $true)]
-    [string]$AccessKey,
-
-    [Parameter(Mandatory = $true)]
-    [string]$Folder
+    [Parameter(Mandatory = $false)]
+    [string]$Folder = "./world"
 )
+
+#
+# Zip the world folders
+#
 
 $backupCommand = @"
 tar -zcvf $ArchiveName $Folder
@@ -22,11 +23,16 @@ tar -zcvf $ArchiveName $Folder
 
 Invoke-Expression -Command $backupCommand
 
-$context = New-AzStorageContext -StorageAccountName $StorageAccountName -StorageAccountKey $AccessKey
+#
+# Upload to blob storage container
+#
+
+# TODO: In order to actually have automatic updates, we need automatic sign in to azure, which involves getting a certificate or something?..
+$context = New-AzStorageContext -StorageAccountName $StorageAccountName -UseConnectedAccount
 
 Set-AzStorageBlobContent @{
     File             = $ArchiveName
-    Container        = $Container
+    Container        = $ContainerName
     Blob             = $Blob
     Context          = $context
     StandardBlobTier = Hot
