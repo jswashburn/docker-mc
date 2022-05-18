@@ -11,8 +11,12 @@ This repo contains the code for a docker image that runs a personal Minecraft se
 docker run -itp 25565:25565 wwishy/gorkcraft
 ```
 3. When you are in the shell, you can run an `ls` to see all the server files. Several scripts from this repo will have been copied over as well. You should be in a Powershell 7 session. Some of them are run automatically, and the below are available to use for server management:
-    - `./Invoke-GorkcraftServer.ps1` to start the server
+    - `./Start-GorkcraftServer.ps1` to start the server
     - `./Update-PaperJar.ps1` to fetch the latest Paper server jar file and replace the current one
+
+## How to use cloud backups
+One feature of this container is its ability to automatically upload backups of your world files to the Microsoft Azure cloud. In order to use this feature you will need an Azure account and subscription. On the initial server run, the cloud resources will be provisioned for you. You may be required to provide your Azure subscription id during this process.  
+> Currently there is not a way to disable automatic cloud backups other than by editing the scripts manually, but this will come in the future.
 
 ## Contributing
 Please keep this doc updated as changes are made, and write good-ish code.  
