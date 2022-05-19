@@ -1,16 +1,14 @@
 [CmdletBinding()]
 param(
+    # Name of the backup archive
     [Parameter(Mandatory = $true)]
-    [string]$StorageAccountName,
+    [string]
+    $ArchiveName,
 
+    # An array of folders to archive
     [Parameter(Mandatory = $true)]
-    [string]$ContainerName,
-
-    [Parameter(Mandatory = $false)]
-    [string]$ArchiveName = "world.tar.gz",
-
-    [Parameter(Mandatory = $false)]
-    [string]$Folder = "./world"
+    [string[]]
+    $Folders = @("world", "world_the_end", "world_nether")
 )
 
 #
@@ -18,7 +16,7 @@ param(
 #
 
 $backupCommand = @"
-tar -zcvf $ArchiveName $Folder
+tar -zcvf $ArchiveName $Folders
 "@
 
 Invoke-Expression -Command $backupCommand
@@ -28,12 +26,12 @@ Invoke-Expression -Command $backupCommand
 #
 
 # TODO: In order to actually have automatic updates, we need automatic sign in to azure, which involves getting a certificate or something?..
-$context = New-AzStorageContext -StorageAccountName $StorageAccountName -UseConnectedAccount
+# TODO: You can attach metadata to blobs, may be a use case here
+$settings = Get-Content -Path $env:GORKCRAFT_SETTINGS | ConvertFrom-Json
 
-Set-AzStorageBlobContent @{
-    File             = $ArchiveName
-    Container        = $ContainerName
-    Blob             = $Blob
-    Context          = $context
-    StandardBlobTier = Hot
-}
+$context = New-AzStorageContext -StorageAccountName $settings.cloudResources.storageAccountName -UseConnectedAccount
+Set-AzStorageBlobContent `
+    -File $ArchiveName `
+    -Container $settings.cloudResources.storageContainerName `
+    -Blob $ArchiveName `
+    -Context $context

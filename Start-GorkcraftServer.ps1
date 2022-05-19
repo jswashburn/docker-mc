@@ -10,31 +10,19 @@ param(
     [string]
     $Memory = "2G",
 
-    # The location of your settings file that will hold information related to resources created in Azure
-    # These cloud resources are used to upload world backups
+    # Whether or not to skip Azure resource creation
     [Parameter(Mandatory = $false)]
-    [string]
-    $SettingsFile = ".\data\settings.json"
+    [switch]
+    $SkipAzResourceProvisioning
 )
 
 #
 # Setup cloud storage for automated backups
 #
 
-if (-not (Test-Path -Path $SettingsFile)) {
-    ConvertTo-Json @{
-        resourcesAlreadyProvisioned = $false
-    } | Out-File $SettingsFile
-}
 
-$azSettings = Get-Content -Path $SettingsFile | ConvertFrom-Json
-if (-not $azSettings.resourcesAlreadyProvisioned) {
-    .\Create-AzGorkcraftResources.ps1 `
-        -SettingsFile $SettingsFile `
-        -ResourceGroupName "gorkcraft-rg"
-        -Location "eastus" `
-        -StorageAccountName "gorkcraftsa" `
-        -StorageContainerName "backups"
+if (-not $settings.cloudResources.resourcesAlreadyProvisioned -and -not $SkipAzResourceProvisioning) {
+    .\Create-AzGorkcraftResources.ps1
 }
 
 #

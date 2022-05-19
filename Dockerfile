@@ -24,6 +24,13 @@ RUN pwsh -Command Install-Module Az.Storage
 RUN pwsh -Command Install-Module Az.KeyVault
 RUN pwsh -Command Install-Module Az.Resources
 
+# Set environment variables
+ENV GORKCRAFT_SETTINGS=data/settings.json
+ENV GORKCRAFT_TEMPLATE=template/gorkcraft.Template.json
+ENV GORKCRAFT_TEMPLATE_PARAMETERS=template/gorkcraft.Parameters.json
+ENV GORKCRAFT_TEMPLATE_PARAMETERS_GENERIC=template/gorkcraft.Parameters-generic.json
+
+# Copy over files in repo, except those specified in the .dockerignore
 COPY . .
 
 # Get the latest Paper server .jar file
