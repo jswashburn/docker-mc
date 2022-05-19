@@ -46,3 +46,6 @@ New-AzResourceGroupDeployment `
     -ResourceGroupName $resourceGroup.ResourceGroupName `
     -TemplateFile $env:GORKCRAFT_TEMPLATE `
     -TemplateParameterFile $env:GORKCRAFT_TEMPLATE_PARAMETERS
+
+$settings.cloudResources.resourcesAlreadyProvisioned = $true
+$settings | ConvertTo-Json | Set-Content $env:GORKCRAFT_SETTINGS
