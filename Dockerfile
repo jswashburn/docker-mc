@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
 
-WORKDIR /serverBackup
+WORKDIR /minecraft-server
 
 # Install Powershell 7
 RUN apt-get update

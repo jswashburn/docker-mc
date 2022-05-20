@@ -2,6 +2,22 @@
 This script deploys the resources needed for world backups to your Azure subscription
 #>
 
+[CmdletBinding()]
+param(
+    # Whether or not to append random letters to the end of resource names.
+    # Could be useful if testing resource creation.
+    [Parameter(Mandatory = $false)]
+    [bool]
+    $UseRandomResourceNameSuffix = $false
+)
+
+$suffix = ($UseRandomResourceNameSuffix ? (-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_})) : "").ToLower()
+$settings = Get-Content -Path $env:SERVER_BACKUP_SETTINGS | ConvertFrom-Json
+$settings.cloudResources.storageAccountName += $suffix
+$settings.cloudResources.storageContainerName += $suffix
+$settings.cloudResources.resourceGroupName += $suffix
+$settings | ConvertTo-Json | Set-Content $env:SERVER_BACKUP_SETTINGS
+
 #
 # Sign in to Azure
 #
@@ -17,7 +33,6 @@ Write-Host $aadUser.DisplayName -ForegroundColor Green
 
 $templateParameters = Get-Content -Path $env:SERVER_BACKUP_TEMPLATE_PARAMETERS_GENERIC -Raw | ConvertFrom-Json
 
-$settings = Get-Content -Path $env:SERVER_BACKUP_SETTINGS | ConvertFrom-Json
 $templateParameters.parameters = @{
     storageAccountName = @{
         value = $settings.cloudResources.storageAccountName
@@ -40,9 +55,10 @@ $templateParameters | ConvertTo-Json | Set-Content $env:SERVER_BACKUP_TEMPLATE_P
 # Create resource group if doesn't exist
 #
 
-Get-AzResourceGroup -Name $settings.cloudResources.resourceGroupName -ErrorVariable resourceGroupNotPresent -ErrorAction SilentlyContinue
+$resourceGroupName = $settings.cloudResources.resourceGroupName
+Get-AzResourceGroup -Name $resourceGroupName -ErrorVariable resourceGroupNotPresent -ErrorAction SilentlyContinue
 if ($resourceGroupNotPresent) {
-    New-AzResourceGroup -Name $settings.cloudResources.resourceGroupName -Location $Location
+    New-AzResourceGroup -Name $resourceGroupName -Location $settings.cloudResources.location
 }
 
 #
@@ -51,7 +67,7 @@ if ($resourceGroupNotPresent) {
 
 Write-Host "Deploying resources..."
 New-AzResourceGroupDeployment `
-    -ResourceGroupName $resourceGroup.ResourceGroupName `
+    -ResourceGroupName $resourceGroupName `
     -TemplateFile $env:SERVER_BACKUP_TEMPLATE `
     -TemplateParameterFile $env:SERVER_BACKUP_TEMPLATE_PARAMETERS
 

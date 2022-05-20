@@ -13,7 +13,13 @@ param(
     # Whether or not to skip Azure resource creation
     [Parameter(Mandatory = $false)]
     [switch]
-    $SkipAzResourceProvisioning
+    $SkipAzResourceProvisioning,
+
+    # Whether or not to use random characters at the end of resource names
+    # Helpful for testing
+    [Parameter(Mandatory = $false)]
+    [switch]
+    $UseRandomResourceNameSuffix = $false
 )
 
 #
@@ -22,7 +28,7 @@ param(
 
 
 if (-not $settings.cloudResources.resourcesAlreadyProvisioned -and -not $SkipAzResourceProvisioning) {
-    .\New-AzBackupResourceDeployment.ps1
+    .\New-AzBackupResourceDeployment.ps1 -UseRandomResourceNameSuffix $UseRandomResourceNameSuffix
 }
 
 #
