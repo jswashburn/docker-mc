@@ -34,7 +34,7 @@ ENV SERVER_BACKUP_TEMPLATE_PARAMETERS_GENERIC=template/serverBackup.Parameters-g
 COPY . .
 
 # Get the latest Paper server .jar file
-RUN pwsh -Command ./Update-PaperJar.ps1 -NoWarn
+RUN pwsh -Command ./Get-UpdatedPaperJar.ps1 -NoWarn
 
 # Do initial server run and accept eula
 RUN java -jar paper-latest.jar --nogui
