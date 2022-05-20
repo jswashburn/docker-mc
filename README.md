@@ -16,7 +16,8 @@ Docker image for Minecraft server
 1. Make sure docker is installed.
 2. Run the following command
     ```pwsh
-    docker run -itp 25565:25565 wwishy/docker-mc
+    docker image build -t <image-name> .
+    docker run -itp 25565:25565 <image-name>
     ```
     > The `-itp 25565:25565` part means *"attach an interactive terminal and map port 25565 on the host to 25565 on the server"*. These are the ports used by Minecraft.
 3. You are now in the server. To get started, run `Start-Server.ps1` in PowerShell and provide your Azure subscription id. If you do not wish to use cloud backups, pass the `-SkipAzResourceProvisioning` flag to the cmdlet.
