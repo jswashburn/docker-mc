@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
 
-WORKDIR /gorkcraft
+WORKDIR /serverBackup
 
 # Install Powershell 7
 RUN apt-get update
@@ -25,10 +25,10 @@ RUN pwsh -Command Install-Module Az.KeyVault
 RUN pwsh -Command Install-Module Az.Resources
 
 # Set environment variables
-ENV GORKCRAFT_SETTINGS=data/settings.json
-ENV GORKCRAFT_TEMPLATE=template/gorkcraft.Template.json
-ENV GORKCRAFT_TEMPLATE_PARAMETERS=template/gorkcraft.Parameters.json
-ENV GORKCRAFT_TEMPLATE_PARAMETERS_GENERIC=template/gorkcraft.Parameters-generic.json
+ENV SERVER_BACKUP_SETTINGS=data/settings.json
+ENV SERVER_BACKUP_TEMPLATE=template/serverBackup.Template.json
+ENV SERVER_BACKUP_TEMPLATE_PARAMETERS=template/serverBackup.Parameters.json
+ENV SERVER_BACKUP_TEMPLATE_PARAMETERS_GENERIC=template/serverBackup.Parameters-generic.json
 
 # Copy over files in repo, except those specified in the .dockerignore
 COPY . .

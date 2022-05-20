@@ -1,3 +1,7 @@
+<#
+This script deploys the resources needed for world backups to your Azure subscription
+#>
+
 #
 # Sign in to Azure
 #
@@ -11,9 +15,9 @@ Write-Host $aadUser.DisplayName -ForegroundColor Green
 # Replace placeholder values in arm parameters file
 #
 
-$templateParameters = Get-Content -Path $env:GORKCRAFT_TEMPLATE_PARAMETERS_GENERIC -Raw | ConvertFrom-Json
+$templateParameters = Get-Content -Path $env:SERVER_BACKUP_TEMPLATE_PARAMETERS_GENERIC -Raw | ConvertFrom-Json
 
-$settings = Get-Content -Path $env:GORKCRAFT_SETTINGS | ConvertFrom-Json
+$settings = Get-Content -Path $env:SERVER_BACKUP_SETTINGS | ConvertFrom-Json
 $templateParameters.parameters = @{
     storageAccountName = @{
         value = $settings.cloudResources.storageAccountName
@@ -26,7 +30,11 @@ $templateParameters.parameters = @{
     }
 }
 
-$templateParameters | ConvertTo-Json | Set-Content $env:GORKCRAFT_TEMPLATE_PARAMETERS
+if (-not (Test-Path $env:SERVER_BACKUP_TEMPLATE_PARAMETERS)) {
+    New-Item -Path $env:SERVER_BACKUP_TEMPLATE_PARAMETERS -ItemType File
+}
+
+$templateParameters | ConvertTo-Json | Set-Content $env:SERVER_BACKUP_TEMPLATE_PARAMETERS
 
 #
 # Create resource group if doesn't exist
@@ -44,8 +52,8 @@ if ($resourceGroupNotPresent) {
 Write-Host "Deploying resources..."
 New-AzResourceGroupDeployment `
     -ResourceGroupName $resourceGroup.ResourceGroupName `
-    -TemplateFile $env:GORKCRAFT_TEMPLATE `
-    -TemplateParameterFile $env:GORKCRAFT_TEMPLATE_PARAMETERS
+    -TemplateFile $env:SERVER_BACKUP_TEMPLATE `
+    -TemplateParameterFile $env:SERVER_BACKUP_TEMPLATE_PARAMETERS
 
 $settings.cloudResources.resourcesAlreadyProvisioned = $true
-$settings | ConvertTo-Json | Set-Content $env:GORKCRAFT_SETTINGS
+$settings | ConvertTo-Json | Set-Content $env:SERVER_BACKUP_SETTINGS

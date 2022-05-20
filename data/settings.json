@@ -1,9 +1,9 @@
 {
   "cloudResources": {
     "resourcesAlreadyProvisioned": false,
-    "resourceGroupName": "gorkcraft-rg",
+    "resourceGroupName": "minecraftserver-rg",
     "location": "eastus",
-    "storageAccountName": "gorkcraftsa",
+    "storageAccountName": "backupssa",
     "storageContainerName": "backups"
   }
 }

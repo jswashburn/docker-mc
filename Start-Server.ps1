@@ -22,7 +22,7 @@ param(
 
 
 if (-not $settings.cloudResources.resourcesAlreadyProvisioned -and -not $SkipAzResourceProvisioning) {
-    .\Create-AzGorkcraftResources.ps1
+    .\New-AzBackupResourceDeployment.ps1
 }
 
 #

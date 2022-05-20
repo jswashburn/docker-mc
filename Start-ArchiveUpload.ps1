@@ -6,7 +6,7 @@ param(
     $ArchiveName,
 
     # An array of folders to archive
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $false)]
     [string[]]
     $Folders = @("world", "world_the_end", "world_nether")
 )
@@ -27,7 +27,7 @@ Invoke-Expression -Command $backupCommand
 
 # TODO: In order to actually have automatic updates, we need automatic sign in to azure, which involves getting a certificate or something?..
 # TODO: You can attach metadata to blobs, may be a use case here
-$settings = Get-Content -Path $env:GORKCRAFT_SETTINGS | ConvertFrom-Json
+$settings = Get-Content -Path $env:SERVER_BACKUP_SETTINGS | ConvertFrom-Json
 
 $context = New-AzStorageContext -StorageAccountName $settings.cloudResources.storageAccountName -UseConnectedAccount
 Set-AzStorageBlobContent `
