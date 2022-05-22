@@ -1,9 +1,9 @@
 {
   "cloudResources": {
-    "resourcesAlreadyProvisioned": false,
-    "resourceGroupName": "minecraftserver-rg",
-    "location": "eastus",
+    "skipResourceProvisioning": false,
+    "resourceGroupName": "mc-server-rg",
     "storageAccountName": "backupssa",
-    "storageContainerName": "backups"
+    "storageContainerName": "backups",
+    "location": "eastus"
   }
 }

@@ -11,7 +11,13 @@ param(
     $UseRandomResourceNameSuffix = $false
 )
 
-$suffix = ($UseRandomResourceNameSuffix ? (-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_})) : "").ToLower()
+# Create a suffix for resource names to avoid naming collisions
+if ($UseRandomResourceNameSuffix) {
+    $suffix = (-join ((65..90) + (97..122) | Get-Random -Count 5 | ForEach-Object {[char]$_})).ToLower()
+} else {
+    $suffix = (New-Guid).Guid.Substring(0, 8)
+}
+
 $settings = Get-Content -Path $env:SERVER_BACKUP_SETTINGS | ConvertFrom-Json
 $settings.cloudResources.storageAccountName += $suffix
 $settings.cloudResources.storageContainerName += $suffix
@@ -71,5 +77,5 @@ New-AzResourceGroupDeployment `
     -TemplateFile $env:SERVER_BACKUP_TEMPLATE `
     -TemplateParameterFile $env:SERVER_BACKUP_TEMPLATE_PARAMETERS
 
-$settings.cloudResources.resourcesAlreadyProvisioned = $true
+$settings.cloudResources.skipResourceProvisioning = $true
 $settings | ConvertTo-Json | Set-Content $env:SERVER_BACKUP_SETTINGS

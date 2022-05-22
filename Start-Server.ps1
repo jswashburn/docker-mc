@@ -10,24 +10,32 @@ param(
     [string]
     $Memory = "2G",
 
-    # Whether or not to skip Azure resource creation
-    [Parameter(Mandatory = $false)]
-    [switch]
-    $SkipAzResourceProvisioning,
-
     # Whether or not to use random characters at the end of resource names
     # Helpful for testing
     [Parameter(Mandatory = $false)]
     [switch]
-    $UseRandomResourceNameSuffix = $false
+    $UseRandomResourceNameSuffix = $false,
+
+    # Whether or not to use the default settings file from the repo
+    [Parameter(Mandatory = $false)]
+    [switch]
+    $DontUseDefaultSettings = $false
 )
+
+#
+# Get user settings
+#
+
+$settings = Get-Content -Path $env:SERVER_BACKUP_SETTINGS | ConvertFrom-Json
+if (-not $settings -or $DontUseDefaultSettings) {
+    ./Set-UserSettings
+}
 
 #
 # Setup cloud storage for automated backups
 #
 
-
-if (-not $settings.cloudResources.resourcesAlreadyProvisioned -and -not $SkipAzResourceProvisioning) {
+if (-not $settings.cloudResources.skipResourceProvisioning) {
     .\New-AzBackupResourceDeployment.ps1 -UseRandomResourceNameSuffix $UseRandomResourceNameSuffix
 }
 
