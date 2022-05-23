@@ -40,4 +40,6 @@ java ``
 
 Invoke-Expression $startServer
 
-Write-Host "Server Stopped!" -ForegroundColor Green
+Write-Host "Server Stopped. Backing up world data..."
+
+.\Start-ArchiveUpload.ps1 -ArchiveName "backup-latest"
