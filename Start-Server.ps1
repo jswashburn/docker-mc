@@ -8,27 +8,17 @@ param(
     # The ammount of memory to allocate to the Minecraft server
     [Parameter(Mandatory = $false)]
     [string]
-    $Memory = "2G",
-
-    # Whether or not to skip Azure resource creation
-    [Parameter(Mandatory = $false)]
-    [switch]
-    $SkipAzResourceProvisioning,
-
-    # Whether or not to use random characters at the end of resource names
-    # Helpful for testing
-    [Parameter(Mandatory = $false)]
-    [switch]
-    $UseRandomResourceNameSuffix = $false
+    $Memory = "2G"
 )
 
-#
-# Setup cloud storage for automated backups
-#
+$settings = .\Get-UserSettings.ps1
+if (-not $settings.cloudResources.skipResourceProvisioning) {
+    .\Write-UserSettings.ps1 -Settings (.\Prompt-UserSettings.ps1)
 
+    .\New-AzBackupResourceDeployment.ps1
 
-if (-not $settings.cloudResources.resourcesAlreadyProvisioned -and -not $SkipAzResourceProvisioning) {
-    .\New-AzBackupResourceDeployment.ps1 -UseRandomResourceNameSuffix $UseRandomResourceNameSuffix
+    $settings.cloudResources.skipResourceProvisioning = $true
+    .\Write-UserSettings.ps1 -Settings $settings
 }
 
 #
@@ -49,3 +39,5 @@ java ``
 "@
 
 Invoke-Expression $startServer
+
+Write-Host "Server Stopped!" -ForegroundColor Green

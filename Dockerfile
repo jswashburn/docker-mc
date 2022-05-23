@@ -24,6 +24,9 @@ RUN pwsh -Command Install-Module Az.Storage
 RUN pwsh -Command Install-Module Az.KeyVault
 RUN pwsh -Command Install-Module Az.Resources
 
+# Install zip and unzip
+RUN apt-get -y install zip unzip
+
 # Set environment variables
 ENV SERVER_BACKUP_SETTINGS=data/settings.json
 ENV SERVER_BACKUP_TEMPLATE=template/serverBackup.Template.json
@@ -39,3 +42,5 @@ RUN pwsh -Command ./Get-UpdatedPaperJar.ps1 -NoWarn
 # Do initial server run and accept eula
 RUN java -jar paper-latest.jar --nogui
 RUN pwsh -Command ./Set-EulaAccepted.ps1 -EulaPath ./eula.txt
+
+CMD [ "pwsh" ]
