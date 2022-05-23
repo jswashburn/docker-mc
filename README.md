@@ -3,10 +3,10 @@
 Docker image for Minecraft server
 
 ## Cool features 😎
-* Setup scripts that provision the required resources in Azure for data backups.
-* Data backup scripts for zipping and uploading folders and files to the Azure cloud.
-* Minecraft server management scripts.
-* Installation tools
+* Setup scripts that provision the required resources in Azure for data backups
+* Data backup scripts for zipping and uploading folders and files to the Azure cloud
+* Minecraft server management scripts
+* Convenience tools for development in the repo like azure/docker cleanup scripts
   
 ## Stuff you need 📃
 * Azure account and subscription (if you want cloud backups)
@@ -20,7 +20,7 @@ Docker image for Minecraft server
     docker run -itp 25565:25565 <image-name>
     ```
     > The `-itp 25565:25565` part means *"attach an interactive terminal and map port 25565 on the host to 25565 on the server"*. These are the ports used by Minecraft.
-3. You are now in the server. To get started, run `Start-Server.ps1` in PowerShell and provide your Azure subscription id. If you do not wish to use cloud backups, pass the `-SkipAzResourceProvisioning` flag to the cmdlet.
+3. You are now in the server. To get started, run `Start-Server.ps1` and sign in to Azure using device authentication. Enter unique names for your resources, if something goes wrong you may want to start over with a new container and clean up your Azure resources. Better client validation coming soon.
 
 ## Useful scripts ⚙️
 ### In this repository
@@ -28,6 +28,8 @@ Docker image for Minecraft server
 ### In the container
 * `Start-Server.ps1` - Starts the Minecraft server and performs initial setup of cloud backup resources.
 * `Start-ArchiveUpload.ps1` - Accepts an array of folder names, archives them, and uploads to your cloud storage.
+* `Get-Backup.ps1` - Gets the blob with specified name from Azure storage container.
+* `Set-WorldFileFromArchive.ps1` - Unzips an archive and places contents into server directory. For now, worlds should be named 'world_*' for this to work. Better world management coming soon.
 * `Get-UpdatedPaperJar.ps1` - Finds the most up to date version of the PaperMC server jar file and replaces the one in the server's directory. Make sure to stop the server first!
 > Any scripts you see not listed above are run behind the scenes, take a look at the comments to see what they do. They are not meant to be run on their own so make sure you understand what's going on first
 
@@ -40,5 +42,3 @@ Currently server backups must be performed manually by running the provided scri
 ## Contributing
 Please keep this doc updated as changes are made, and write good-ish code.  
 Over-engineer everything.
-### TODO
-* Download world backups
