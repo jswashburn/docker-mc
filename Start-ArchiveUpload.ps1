@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    # Name of the backup archive
+    # Name of the backup archive. This will also be the name of the blob
     [Parameter(Mandatory = $true)]
     [string]
     $ArchiveName,
@@ -25,8 +25,6 @@ Invoke-Expression -Command $backupCommand
 # Upload to blob storage container
 #
 
-# TODO: In order to actually have automatic updates, we need automatic sign in to azure, which involves getting a certificate or something?..
-# TODO: You can attach metadata to blobs, may be a use case here
 $settings = Get-Content -Path $env:SERVER_BACKUP_SETTINGS | ConvertFrom-Json
 
 $context = New-AzStorageContext -StorageAccountName $settings.cloudResources.storageAccountName -UseConnectedAccount

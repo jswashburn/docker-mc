@@ -12,7 +12,7 @@ param(
 )
 
 
-$settings = Get-Content -Path $env:SERVER_BACKUP_SETTINGS | ConvertFrom-Json
+$settings = .\Get-UserSettings.ps1
 $context = New-AzStorageContext -StorageAccountName $settings.cloudResources.storageAccountName -UseConnectedAccount
 
 Get-AzStorageBlobContent `

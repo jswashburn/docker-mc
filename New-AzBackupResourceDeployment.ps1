@@ -1,36 +1,10 @@
-<#
-This script deploys the resources needed for world backups to your Azure subscription
-#>
-
-[CmdletBinding()]
-param(
-    # Whether or not to append random letters to the end of resource names.
-    # Could be useful if testing resource creation.
-    [Parameter(Mandatory = $false)]
-    [bool]
-    $UseRandomResourceNameSuffix = $false
-)
-
-# Create a suffix for resource names to avoid naming collisions
-if ($UseRandomResourceNameSuffix) {
-    $suffix = (-join ((65..90) + (97..122) | Get-Random -Count 5 | ForEach-Object {[char]$_})).ToLower()
-} else {
-    $suffix = (New-Guid).Guid.Substring(0, 8)
-}
-
-$settings = Get-Content -Path $env:SERVER_BACKUP_SETTINGS | ConvertFrom-Json
-$settings.cloudResources.storageAccountName += $suffix
-$settings.cloudResources.storageContainerName += $suffix
-$settings.cloudResources.resourceGroupName += $suffix
-$settings | ConvertTo-Json | Set-Content $env:SERVER_BACKUP_SETTINGS
-
 #
 # Sign in to Azure
 #
 
 Connect-AzAccount -UseDeviceAuthentication
 $aadUser = Get-AzADUser
-Write-Host "Signed in user"
+Write-Host "Signed in user " -NoNewline
 Write-Host $aadUser.DisplayName -ForegroundColor Green
 
 #
@@ -39,6 +13,7 @@ Write-Host $aadUser.DisplayName -ForegroundColor Green
 
 $templateParameters = Get-Content -Path $env:SERVER_BACKUP_TEMPLATE_PARAMETERS_GENERIC -Raw | ConvertFrom-Json
 
+$settings = .\Get-UserSettings.ps1
 $templateParameters.parameters = @{
     storageAccountName = @{
         value = $settings.cloudResources.storageAccountName
@@ -75,7 +50,6 @@ Write-Host "Deploying resources..."
 New-AzResourceGroupDeployment `
     -ResourceGroupName $resourceGroupName `
     -TemplateFile $env:SERVER_BACKUP_TEMPLATE `
-    -TemplateParameterFile $env:SERVER_BACKUP_TEMPLATE_PARAMETERS
+    -TemplateParameterFile $env:SERVER_BACKUP_TEMPLATE_PARAMETERS 
 
-$settings.cloudResources.skipResourceProvisioning = $true
-$settings | ConvertTo-Json | Set-Content $env:SERVER_BACKUP_SETTINGS
+Set-AzResourceGroup -Name $resourceGroupName -Tag @{"docker-mc"=""}

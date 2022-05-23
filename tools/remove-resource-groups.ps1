@@ -1,0 +1,1 @@
+Get-AzResourceGroup -Tag @{"docker-mc"=""} |  Remove-AzResourceGroup -Force -AsJob

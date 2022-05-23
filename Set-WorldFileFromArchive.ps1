@@ -10,6 +10,7 @@ param(
 # Extract the archive, move its contents to parent directory, remove empty directory
 #
 
+# TODO: mv command below not working and probs not needed
 $backupCommand = @"
 tar -zxvf $ArchiveName
 mv $ArchiveName/* .
