@@ -25,7 +25,7 @@ Invoke-Expression -Command $backupCommand
 # Upload to blob storage container
 #
 
-$settings = .\Get-UserSettings
+$settings = .\Get-UserSettings.ps1
 $context = New-AzStorageContext -StorageAccountName $settings.cloudResources.storageAccountName -UseConnectedAccount
 Set-AzStorageBlobContent `
     -File $ArchiveName `
