@@ -2,14 +2,23 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "userPrincipleId": {
+            "value": "userPrincipleId"
+        },
+        "location": {
+            "value": "eastus"
+        },
+        "resourceGroupName": {
+            "value": "rgName"
+        },
         "storageAccountName": {
-            "value": "__STORAGE_ACCOUNT_NAME__"
+            "value": "storageAccountName"
         },
         "storageContainerName": {
-            "value": "__STORAGE_CONTAINER_NAME__"
+            "value": "storageContainerName"
         },
-        "userPrincipleId": {
-            "value": "__USER_PRINCIPLE_ID__"
+        "environment": {
+            "value": "test"
         }
     }
 }

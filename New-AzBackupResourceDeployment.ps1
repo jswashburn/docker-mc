@@ -15,6 +15,12 @@ $templateParameters = Get-Content -Path $env:SERVER_BACKUP_TEMPLATE_PARAMETERS_G
 
 $settings = .\Get-UserSettings.ps1
 $templateParameters.parameters = @{
+    location = @{
+        value = $settings.cloudResources.location
+    }
+    resourceGroupName = @{
+        value = $settings.cloudResources.resourceGroupName
+    }
     storageAccountName = @{
         value = $settings.cloudResources.storageAccountName
     }
@@ -23,6 +29,9 @@ $templateParameters.parameters = @{
     }
     userPrincipleId = @{
         value = $aadUser.Id
+    }
+    environment = @{
+        value = $settings.cloudResources.environment
     }
 }
 
@@ -33,23 +42,24 @@ if (-not (Test-Path $env:SERVER_BACKUP_TEMPLATE_PARAMETERS)) {
 $templateParameters | ConvertTo-Json | Set-Content $env:SERVER_BACKUP_TEMPLATE_PARAMETERS
 
 #
-# Create resource group if doesn't exist
-#
-
-$resourceGroupName = $settings.cloudResources.resourceGroupName
-Get-AzResourceGroup -Name $resourceGroupName -ErrorVariable resourceGroupNotPresent -ErrorAction SilentlyContinue
-if ($resourceGroupNotPresent) {
-    New-AzResourceGroup -Name $resourceGroupName -Location $settings.cloudResources.location
-}
-
-#
 # Deploy arm template with parameters
 #
 
 Write-Host "Deploying resources..."
-New-AzResourceGroupDeployment `
-    -ResourceGroupName $resourceGroupName `
+$deployment = New-AzDeployment `
+    -Location $settings.cloudResources.location `
     -TemplateFile $env:SERVER_BACKUP_TEMPLATE `
-    -TemplateParameterFile $env:SERVER_BACKUP_TEMPLATE_PARAMETERS 
+    -TemplateParameterFile $env:SERVER_BACKUP_TEMPLATE_PARAMETERS `
+    -InformationAction SilentlyContinue `
+    -ErrorVariable "deployError" `
+    -ErrorAction SilentlyContinue
 
-Set-AzResourceGroup -Name $resourceGroupName -Tag @{"docker-mc"=""}
+if ($deployment.ProvisioningState -eq 'Succeeded') {
+    Write-Host "Deployment Succeeded!" -ForegroundColor Green
+} else {
+    Write-Host "Deployment did not succeed."
+    if ($deployError) {
+        Write-Host "Error: "
+        Write-Output $deployError
+    }
+}

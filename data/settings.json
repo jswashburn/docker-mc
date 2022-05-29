@@ -1,9 +1,10 @@
 {
   "cloudResources": {
     "skipResourceProvisioning": false,
-    "resourceGroupName": "mc-server-rg",
-    "storageAccountName": "backupssa",
-    "storageContainerName": "backups",
-    "location": "eastus"
+    "resourceGroupName": "docker-mc-rg",
+    "storageAccountName": "dockermcsa",
+    "storageContainerName": "dockermccontainer",
+    "location": "eastus",
+    "environment": "test"
   }
 }

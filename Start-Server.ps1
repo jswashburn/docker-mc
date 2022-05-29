@@ -13,7 +13,8 @@ param(
 
 $settings = .\Get-UserSettings.ps1
 if (-not $settings.cloudResources.skipResourceProvisioning) {
-    .\Write-UserSettings.ps1 -Settings (.\Prompt-UserSettings.ps1)
+    $settings = .\Prompt-UserSettings.ps1
+    .\Write-UserSettings.ps1 -Settings $settings
 
     .\New-AzBackupResourceDeployment.ps1
 

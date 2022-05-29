@@ -1,73 +1,113 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "userPrincipleId": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "eastus"
+        },
+        "resourceGroupName": {
+            "type": "string",
+            "defaultValue": "docker-mc-rg"
+        },
         "storageAccountName": {
-            "type": "String",
-            "metadata": {
-                "description": "The name of your storage account. This resource is needed to store backups."
-            }
+            "type": "string"
         },
         "storageContainerName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of your blob storage container. This resource exists under your storage account."
-            }
+            "type": "string"
         },
-        "userPrincipleId": {
+        "environment": {
             "type": "string",
-            "metadata": {
-                "description": "The ID of your Azure user principle. This will be automatically inserted."
-            }
+            "allowedValues": ["prod", "test"]
         }
     },
-    "variables": {},
+    "variables": {
+        "uniqueRoleAssignmentName": "[guid(subscription().subscriptionId)]",
+        "storageBlobDataContributor": "ba92f5b4-2d11-453d-a403-e96b0029c9fe",
+        "commonTags": {
+            "docker-mc-env": "[parameters('environment')]"
+        }
+    },
     "resources": [
         {
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2021-09-01",
-            "name": "[parameters('storageAccountName')]",
-            "location": "eastus",
-            "sku": {
-                "name": "Standard_RAGRS",
-                "tier": "Standard"
-            },
-            "kind": "StorageV2",
-            "properties": {
-                "accessTier": "Hot"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/blobServices",
-            "apiVersion": "2021-09-01",
-            "name": "[concat(parameters('storageAccountName'), '/default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
-            ],
-            "sku": {
-                "name": "Standard_RAGRS",
-                "tier": "Standard"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2021-09-01",
-            "name": "[concat(parameters('storageAccountName'), '/default/', parameters('storageContainerName'))]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
-            ],
-            "properties": {
-                "publicAccess": "Blob"
-            }
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2021-04-01",
+            "name": "[parameters('resourceGroupName')]",
+            "location": "[parameters('location')]",
+            "tags": "[variables('commonTags')]"
         },
         {
             "type": "Microsoft.Authorization/roleAssignments",
             "apiVersion": "2020-10-01-preview",
-            "name": "[guid(resourceGroup().id)]",
+            "name": "[variables('uniqueRoleAssignmentName')]",
             "properties": {
-                "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
+                "roleDefinitionId": "[
+                    concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', variables('storageBlobDataContributor'))]",
                 "principalId": "[parameters('userPrincipleId')]"
+            },
+            "tags": "[variables('commonTags')]"
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "docker-mc-backups-storage-deployment",
+            "dependsOn": [
+                "[parameters('resourceGroupName')]",
+                "[variables('uniqueRoleAssignmentName')]"
+            ],
+            "resourceGroup": "[parameters('resourceGroupName')]",
+            "tags": "[variables('commonTags')]",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Storage/storageAccounts",
+                            "apiVersion": "2021-09-01",
+                            "name": "[parameters('storageAccountName')]",
+                            "location": "[parameters('location')]",
+                            "sku": {
+                                "name": "Standard_LRS",
+                                "tier": "Standard"
+                            },
+                            "kind": "StorageV2",
+                            "properties": {
+                                "accessTier": "Hot"
+                            },
+                            "tags": "[variables('commonTags')]"
+                        },
+                        {
+                            "type": "Microsoft.Storage/storageAccounts/blobServices",
+                            "apiVersion": "2021-09-01",
+                            "name": "[concat(parameters('storageAccountName'), '/default')]",
+                            "dependsOn": [
+                                "[parameters('storageAccountName')]"
+                            ],
+                            "sku": {
+                                "name": "Standard_LRS",
+                                "tier": "Standard"
+                            },
+                            "tags": "[variables('commonTags')]"
+                        },
+                        {
+                            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+                            "apiVersion": "2021-09-01",
+                            "name": "[concat(parameters('storageAccountName'), '/default/', parameters('storageContainerName'))]",
+                            "dependsOn": [
+                                "[parameters('storageAccountName')]"
+                            ],
+                            "properties": {
+                                "publicAccess": "Blob"
+                            },
+                            "tags": "[variables('commonTags')]"
+                        }
+                    ]
+                }
             }
         }
     ]

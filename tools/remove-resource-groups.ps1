@@ -4,4 +4,4 @@ if ($notSignedIn) {
     Connect-AzAccount -UseDeviceAuthentication
 }
 
-Get-AzResourceGroup -Tag @{"docker-mc"=""} |  Remove-AzResourceGroup -Force -AsJob
+Get-AzResourceGroup -Tag @{"docker-mc-env" = "test"} |  Remove-AzResourceGroup -Force -AsJob

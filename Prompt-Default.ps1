@@ -11,4 +11,4 @@ param(
     $Default
 )
 
-return (Read-Host $Prompt -OutVariable val) -eq "" ? $Default : $val[0]
+return (Read-Host "$Prompt (Enter nothing for default: '$Default')" -OutVariable val) -eq "" ? $Default : $val[0]

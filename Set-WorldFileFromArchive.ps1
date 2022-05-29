@@ -13,7 +13,6 @@ param(
 # TODO: mv command below not working and probs not needed
 $backupCommand = @"
 tar -zxvf $ArchiveName
-mv $ArchiveName/* .
 rm -r $ArchiveName
 "@
 
